@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^django-rq/', include('django_rq.urls')),
     url(r'^auth/', include('auth_manager.urls')),
     url(r'^fw/', include('fw_manager.urls')),
+    url(r'^cert/', include('cert_manager.urls')),
 ]
