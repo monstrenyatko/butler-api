@@ -56,6 +56,7 @@ class UserDetailView(generics.RetrieveDestroyAPIView):
 
 class DeviceListView(UserListView):
     queryset = get_user_model().objects.filter(profile__is_device=True)
+    serializer_class = local_serializers.DeviceSerializer
 
     def get_serializer_context(self):
         return get_device_serializer_context(super().get_serializer_context())
@@ -63,6 +64,7 @@ class DeviceListView(UserListView):
 
 class DeviceDetailView(UserDetailView):
     queryset = get_user_model().objects.filter(profile__is_device=True)
+    serializer_class = local_serializers.DeviceSerializer
 
     def get_serializer_context(self):
         return get_device_serializer_context(super().get_serializer_context())

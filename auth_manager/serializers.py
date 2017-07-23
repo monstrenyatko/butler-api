@@ -33,7 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'password', 'date_joined', 'auth_token', 'profile')
+        fields = ('username', 'password', 'date_joined', 'auth_token', 'profile', 'is_staff')
         extra_kwargs = {
             'password': {'write_only': True, 'required': False},
             'date_joined': {'read_only': True},
@@ -73,6 +73,10 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+class DeviceSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
+        fields = ('username', 'password', 'date_joined', 'auth_token', 'profile',)
 
 class EnableAuthSerializer(serializers.Serializer):
     username = serializers.CharField(label=_("Username"))
