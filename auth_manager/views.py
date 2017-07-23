@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework import exceptions
 from rest_framework.authtoken import views as rest_view
 from rest_framework.authtoken.models import Token
+from rest_framework import permissions as rest_permissions
 from . import serializers as local_serializers
 from .utils import verify_secure
 
@@ -19,6 +20,7 @@ def get_device_serializer_context(serializer_context):
 
 
 class UserListView(generics.ListCreateAPIView):
+    permission_classes = (rest_permissions.IsAdminUser,)
     queryset = get_user_model().objects.all()
     serializer_class = local_serializers.UserSerializer
 
@@ -39,6 +41,7 @@ class UserListView(generics.ListCreateAPIView):
 
 
 class UserDetailView(generics.RetrieveDestroyAPIView):
+    permission_classes = (rest_permissions.IsAdminUser,)
     queryset = get_user_model().objects.all()
     serializer_class = local_serializers.UserSerializer
     lookup_field = 'username'
@@ -71,6 +74,7 @@ class DeviceDetailView(UserDetailView):
 
 
 class EnableAuthView(APIView):
+    permission_classes = (rest_permissions.IsAdminUser,)
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = local_serializers.EnableAuthSerializer
 

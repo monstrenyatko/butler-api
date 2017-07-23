@@ -5,7 +5,6 @@ from . import models as local_models
 
 class CertificateFingerprintView(generics.ListAPIView):
     serializer_class = local_serializers.CertificateFingerprintSerializer
-    authentication_classes = []
     permission_classes = []
 
     def get_queryset(self):
