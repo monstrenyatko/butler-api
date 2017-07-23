@@ -42,17 +42,23 @@ class UserSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
+        # Pop UserProfile data
         profile_data = validated_data.pop('profile', {})
+        # Create User
         instance = get_user_model().objects.create_user(**validated_data)
-        local_models.UserProfileModel.objects.create(user=instance, **profile_data)
+        # Update UserProfile
+        for attr, value in profile_data.items():
+            setattr(instance.profile, attr, value)
         instance.profile.is_device = self.context.get('is_device', False)
-        Token.objects.create(user=instance)
+        # Check password availability if required
         if (not instance.profile.is_device) and (not 'password' in validated_data):
             raise serializers.ValidationError({'password': [
                 self.fields['password'].error_messages['required']
             ]})
+        # Set password == user-name if required
         if instance.profile.is_device:
             instance.set_password(instance.username)
+        # Done
         instance.save()
         return instance
 
