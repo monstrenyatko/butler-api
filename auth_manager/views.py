@@ -92,11 +92,12 @@ class GetAuthTokenView(rest_view.ObtainAuthToken):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        now = timezone.now()
-        if user.profile.is_auth_retrieved:
-            raise exceptions.PermissionDenied(detail='Token has been already retrieved')
-        if user.auth_token.created < now - settings.AUTH_TIME_INTERVAL:
-            raise exceptions.PermissionDenied(detail='Token cannot be retrieved anymore')
+        if not user.is_staff:
+            now = timezone.now()
+            if user.profile.is_auth_retrieved:
+                raise exceptions.PermissionDenied(detail='Token has been already retrieved')
+            if user.auth_token.created < now - settings.AUTH_TIME_INTERVAL:
+                raise exceptions.PermissionDenied(detail='Token cannot be retrieved anymore')
         user.profile.is_auth_retrieved = True
         user.save()
         return Response({'token': user.auth_token.key})
