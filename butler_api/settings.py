@@ -172,3 +172,5 @@ CSRF_COOKIE_SECURE = True
 
 AUTH_TIME_INTERVAL = timedelta(minutes=15)
 
+APP_DATA_CERT_DIR = '/tmp/butler-certs'
+
