@@ -127,13 +127,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# rest_framework
-# REST_FRAMEWORK = {
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.IsAdminUser',
-#     ],
-#     'PAGE_SIZE': 10
-# }
 REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': (
@@ -163,8 +156,6 @@ RQ_QUEUES = {
 #     }
 }
 
-#AUTH_USER_MODEL = 'fw_manager.User'
-
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
@@ -173,4 +164,5 @@ CSRF_COOKIE_SECURE = True
 AUTH_TIME_INTERVAL = timedelta(minutes=15)
 
 APP_DATA_CERT_DIR = '/tmp/butler-certs'
+APP_DATA_FW_DIR = '/tmp/butler-fw'
 
