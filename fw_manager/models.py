@@ -8,13 +8,14 @@ class FirmwareModel(models.Model):
             r'^[0-9a-zA-Z\-_]*$',
             'Only Alphanumeric characters, Hyphen and Underscore symbols are allowed'
     )
+    NameValidator = AlphaNumericHyphenMinusUnderscoreValidator
 
     HW_ESP8266_4MB = 'ESP8266-4MB'
     HW_CHOICES = (
         (HW_ESP8266_4MB, 'ESP8266 with 4MB flash'),
     )
 
-    name = models.CharField(max_length=150, primary_key=True, validators=[AlphaNumericHyphenMinusUnderscoreValidator])
+    name = models.CharField(max_length=150, primary_key=True, validators=[NameValidator])
     hardware = models.CharField(max_length=50, choices=HW_CHOICES)
     description = models.TextField(max_length=250, blank=True)
 

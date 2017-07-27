@@ -1,23 +1,49 @@
-from rest_framework.views import APIView
+import os
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from rest_framework import views
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import permissions as rest_permissions
-from rest_framework import exceptions
+from rest_framework import exceptions as rest_exceptions
+from rest_framework import parsers  as rest_parsers
 from auth_manager.utils import verify_secure
 from . import esp8266
 from . import serializers as local_serializers
 from . import models as local_models
 
 
-class FirmwareUpdateView(APIView):
-
+class FirmwareUpdateView(views.APIView):
     """ Provides the firmware if the update is required """
     def get(self, request):
         verify_secure(request)
         if esp8266.Esp8266FirmwareUpdate.verifyRequest(request):
             return esp8266.Esp8266FirmwareUpdate.update(request)
         return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+class FirmwareUploadView(views.APIView):
+    permission_classes = (rest_permissions.IsAdminUser,)
+    parser_classes = (rest_parsers.FileUploadParser,)
+
+    """ Uploads the firmware file to the storage """
+    def put(self, request, filename):
+        verify_secure(request)
+        try:
+            local_models.FirmwareModel.NameValidator(filename)
+        except ValidationError as e:
+            raise rest_exceptions.ValidationError({filename:list(e)})
+        out_dir = settings.APP_DATA_FW_DIR
+        os.makedirs(out_dir, exist_ok=True)
+        if not os.access(out_dir, os.W_OK):
+            raise rest_exceptions.APIException('The [{:s}] is not writable'.format(out_dir))
+        out_path = os.path.join(out_dir, filename)
+        file_obj = request.data['file']
+        with open(out_path, 'wb') as out_file:
+            for chunk in file_obj.chunks():
+                out_file.write(chunk)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FirmwareListView(generics.ListCreateAPIView):
@@ -120,4 +146,4 @@ class FirmwareAssignmentDetailView(generics.RetrieveUpdateDestroyAPIView):
         try:
             return local_models.FirmwareAssignmentModel.objects.get(user__username=username)
         except local_models.FirmwareAssignmentModel.DoesNotExist:
-            raise exceptions.NotFound(detail='[{}] is not found'.format(username))
+            raise rest_exceptions.NotFound(detail='[{}] is not found'.format(username))
