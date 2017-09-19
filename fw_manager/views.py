@@ -1,5 +1,6 @@
 import os
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from rest_framework import views
 from rest_framework.response import Response
@@ -18,9 +19,33 @@ class FirmwareUpdateView(views.APIView):
     """ Provides the firmware if the update is required """
     def get(self, request):
         verify_secure(request)
-        if esp8266.Esp8266FirmwareUpdate.verifyRequest(request):
-            return esp8266.Esp8266FirmwareUpdate.update(request)
-        return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+        if not request.user.profile.is_device:
+            raise rest_exceptions.NotAcceptable('Only for devices')
+        assignment = request.user.firmware
+        if assignment.value.hardware == local_models.FirmwareModel.HW_ESP8266_4MB:
+            return esp8266.update(request, assignment)
+        else:
+            raise rest_exceptions.NotAcceptable('The [{:s}] is not supported'.format(assignment.value.hardware))
+
+
+class FirmwareUpdateAnonymousView(views.APIView):
+    permission_classes = (rest_permissions.AllowAny,)
+
+    """ Provides the firmware if the update is required for not secure connection """
+    def get(self, request, **kwargs):
+        username = kwargs['username']
+        user = None
+        try:
+            user = get_user_model().objects.get(username=username)
+        except get_user_model().DoesNotExist:
+            raise rest_exceptions.NotFound({username: 'Not found'})
+        if not user.profile.is_device:
+            raise rest_exceptions.NotAcceptable('Only for devices')
+        assignment = user.firmware
+        if assignment.value.hardware == local_models.FirmwareModel.HW_ESP8266_4MB:
+            return esp8266.update(request, assignment)
+        else:
+            raise rest_exceptions.NotAcceptable('The [{:s}] is not supported'.format(assignment.value.hardware))
 
 
 class FirmwareUploadView(views.APIView):
