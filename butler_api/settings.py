@@ -26,7 +26,7 @@ SECRET_KEY = 'k*pvc(kw&n*n@+2#q^krs6t^z+z6alf4@_go-qgy_5j-8mj9x&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.getenv('BUTLER_HOST', 'butler'), 'localhost', '127.0.0.1', '[::1]']
 
 
 # Application definition
@@ -163,6 +163,5 @@ CSRF_COOKIE_SECURE = True
 
 AUTH_TIME_INTERVAL = timedelta(minutes=15)
 
-APP_DATA_CERT_DIR = '/tmp/butler-certs'
-APP_DATA_FW_DIR = '/tmp/butler-fw'
-
+APP_DATA_CERT_DIR = os.path.join(os.getenv('BUTLER_HOME'), 'cert')
+APP_DATA_FW_DIR = os.path.join(os.getenv('BUTLER_HOME'), 'fw')
