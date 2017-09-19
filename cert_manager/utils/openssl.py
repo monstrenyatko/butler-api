@@ -207,8 +207,8 @@ def update_server_fingerprint(path, hostname=OPENSSL_CS_DEFAULT_HOSTNAME):
     if fp_next:
         local_models.CertificateFingerprintModel.objects.get_or_create(name=hostname, value=fp_next)
     # Cleanup old values
-    local_models.CertificateFingerprintModel.objects.exclude(
-        Q(value = fp_current) | Q(value = fp_next)
+    local_models.CertificateFingerprintModel.objects.filter(
+        (Q(name = hostname) & ~Q(value = fp_current) & ~Q(value = fp_next))
     ).delete()
 
 def get_client_stream(path, hostname, name, form=OPENSSL_C_FORM_PEM):
