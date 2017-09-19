@@ -95,6 +95,7 @@ class GetAuthTokenView(rest_view.ObtainAuthToken):
 
     """ Returns the access token """
     def post(self, request):
+        verify_secure(request)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
