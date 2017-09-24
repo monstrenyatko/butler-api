@@ -5,11 +5,3 @@
 
 # Python
 *.pyc
-
-# Django
-**/migrations/*
-!**/migrations/__init__.py
-
-# Django DB
-db.sqlite3
-
