@@ -38,13 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_rq',
     'rest_framework',
     'rest_framework.authtoken',
     'auth_manager.apps.AuthManagerConfig',
     'fw_manager.apps.FwManagerConfig',
     'cert_manager.apps.CertManagerConfig',
-    'sslserver',
 ]
 
 MIDDLEWARE = [
