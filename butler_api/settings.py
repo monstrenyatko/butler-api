@@ -10,23 +10,70 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
-import os
+import sys
+import os.path
 from datetime import timedelta
+import logging
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Deployment checklist
+#  https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
+# The secret key must be a large random value and it must be kept secret
+with open(os.environ.get('BUTLER_API_DJANGO_SECRET_KEY_FILE'),'r') as f:
+    SECRET_KEY = f.read().replace('\n', '')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'k*pvc(kw&n*n@+2#q^krs6t^z+z6alf4@_go-qgy_5j-8mj9x&'
+# Disabled debug mode by default
+DEBUG = bool(os.environ.get('DEBUG', False))
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Logger settings
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[%(asctime)s] [%(process)d] [%(levelname)s] [%(module)s:%(lineno)d] '
+                      '%(message)s'
+        },
+        'simple': {
+            'format': '[%(asctime)s]  [%(levelname)s] %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': os.environ.get('BUTLER_API_DJANGO_LOG_LEVEL', 'INFO'),
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': os.environ.get('BUTLER_API_DJANGO_REQ_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': os.environ.get('BUTLER_API_DJANGO_DB_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    }
+}
 
-ALLOWED_HOSTS = [os.getenv('BUTLER_HOST', 'butler'), 'localhost', '127.0.0.1', '[::1]']
+ALLOWED_HOSTS = [os.environ.get('BUTLER_HOST', 'butler'), 'localhost', '127.0.0.1', '[::1]']
 
 
 # Application definition
@@ -79,16 +126,16 @@ WSGI_APPLICATION = 'butler_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-with open(os.getenv('BUTLER_DB_PASSWORD_FILE'),'r') as f:
+with open(os.environ.get('BUTLER_DB_PASSWORD_FILE'),'r') as f:
     DB_PASSWORD = f.read().replace('\n', '')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('BUTLER_DB_NAME'),
-        'USER': os.getenv('BUTLER_DB_USER'),
+        'NAME': os.environ.get('BUTLER_DB_NAME'),
+        'USER': os.environ.get('BUTLER_DB_USER'),
         'PASSWORD': DB_PASSWORD,
-        'HOST': os.getenv('BUTLER_DB_HOST'),
+        'HOST': os.environ.get('BUTLER_DB_HOST'),
         'PORT': '',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -120,13 +167,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 
@@ -135,6 +178,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Django REST framework
+# http://www.django-rest-framework.org/
 REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': (
@@ -145,31 +190,27 @@ REST_FRAMEWORK = {
     )
 }
 
-RQ_QUEUES = {
-    'default': {
-        'HOST': '192.168.99.100',
-        'PORT': 6379,
-        'DB': 0,
-#         'PASSWORD': 'some-password',
-        'DEFAULT_TIMEOUT': 360,
-    },
-#     'high': {
-#         'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
-#         'DEFAULT_TIMEOUT': 500,
-#     },
-#     'low': {
-#         'HOST': 'localhost',
-#         'PORT': 6379,
-#         'DB': 0,
-#     }
-}
+
+# Other settings
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_HSTS_SECONDS = 0
 AUTH_TIME_INTERVAL = timedelta(minutes=15)
+APP_DATA_CERT_DIR = os.path.join(os.environ.get('BUTLER_HOME'), 'cert')
+APP_DATA_FW_DIR = os.path.join(os.environ.get('BUTLER_HOME'), 'fw')
 
-APP_DATA_CERT_DIR = os.path.join(os.getenv('BUTLER_HOME'), 'cert')
-APP_DATA_FW_DIR = os.path.join(os.getenv('BUTLER_HOME'), 'fw')
+
+# Load external config if required
+EXTERNAL_SETTINGS = os.environ.get('BUTLER_API_DJANGO_EXTERNAL_SETTINGS_DIR', None)
+if EXTERNAL_SETTINGS:
+    sys.path.append(os.path.abspath(EXTERNAL_SETTINGS))
+    try:
+        from external_settings import *
+    except ImportError as e:
+        logging.getLogger(__name__).warn("Can't load `external_settings.py` from {}, error: {}".format(EXTERNAL_SETTINGS, str(e)))
