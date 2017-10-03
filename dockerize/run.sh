@@ -30,7 +30,7 @@ set -e
 
 if [ -n "$BUTLER_API_GID" -a -n "$APP_USERNAME" -a "$APP_USERNAME" != 'root' ]; then
 	groupmod --gid $BUTLER_API_GID $APP_USERNAME
-	usermod --gid $BUTLER_API_UID $APP_USERNAME
+	usermod --gid $BUTLER_API_GID $APP_USERNAME
 fi
 
 if [ -n "$BUTLER_API_UID" -a -n "$APP_USERNAME" -a "$APP_USERNAME" != 'root' ]; then
