@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 import hashlib
 import datetime
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from OpenSSL.crypto import load_certificate, FILETYPE_PEM
@@ -78,6 +79,15 @@ def read_str_file(file_path):
             res = file.read()
     return res
 
+def set_cert_key_owner(file_path):
+    os.chown(file_path,
+        settings.APP_DATA_CERT_KEY_FILE_UID,
+        settings.APP_DATA_CERT_KEY_FILE_GID
+    )
+
+def set_cert_key_mode(file_path):
+    os.chmod(file_path, settings.APP_DATA_CERT_KEY_FILE_MODE)
+
 def openssl(*args):
     cmdline = [OPENSSL_CMD] + list(args)
     subprocess.check_call(cmdline, stderr=subprocess.STDOUT)
@@ -143,6 +153,9 @@ def gen_c(path, path_out, hostname, days):
             '-out', make_c_file_name(path_out, hostname, OPENSSL_C_NAME_CRT),
     )
     config.close()
+    # update permissions
+    set_cert_key_mode(make_c_file_name(path_out, hostname, OPENSSL_C_NAME_KEY))
+    set_cert_key_owner(make_c_file_name(path_out, hostname, OPENSSL_C_NAME_KEY))
 
 def gen_ca(path, days=OPENSSL_CA_DEFAULT_DAYS):
     prepare_dir(make_ca_dir_path(path))
@@ -164,6 +177,9 @@ def gen_ca(path, days=OPENSSL_CA_DEFAULT_DAYS):
             '-in', make_ca_file_name(path, OPENSSL_C_NAME_CRT),
             '-out', make_ca_file_name(path, OPENSSL_C_NAME_CRT, OPENSSL_C_FORM_DER),
     )
+    # update permissions
+    set_cert_key_mode(make_ca_private_file_name(path, OPENSSL_C_NAME_KEY))
+    set_cert_key_owner(make_ca_private_file_name(path, OPENSSL_C_NAME_KEY))
 
 def gen_server(path, hostname=OPENSSL_CS_DEFAULT_HOSTNAME, days=OPENSSL_CS_DEFAULT_DAYS):
     path_out = os.path.join(path, OPENSSL_CS_DIR_NAME, hostname, OPENSSL_C_RENEWED_DIR_NAME)

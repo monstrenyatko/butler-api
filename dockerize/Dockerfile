@@ -14,7 +14,10 @@ RUN apk update && \
 
 RUN buildDeps='build-base mariadb-dev python3-dev'; \
     apk update && \
-    apk add --no-cache $buildDeps mariadb-client-libs && \
+    apk add --no-cache $buildDeps mariadb-client-libs bash su-exec shadow && \
+    \
+# mimic gosu
+    ln -s /sbin/su-exec /usr/bin/gosu && \
     \
     pip3 install \
     django \
@@ -26,8 +29,15 @@ RUN buildDeps='build-base mariadb-dev python3-dev'; \
     rm -rf /root/.cache && mkdir -p /root/.cache && \
     rm -rf /tmp/* /var/tmp/* /var/cache/apk/*
 
+ENV APP_USERNAME="butler"
+RUN addgroup -S $APP_USERNAME && \
+    adduser -S -h /butler-api -g $APP_USERNAME -G $APP_USERNAME $APP_USERNAME
+
 COPY dockerize/run.sh /
 RUN chmod +x /run.sh
+
+COPY dockerize/app-entrypoint.sh /
+RUN chmod +x /app-entrypoint.sh
 
 RUN ln -s /butler-api/src/manage.py /usr/local/bin/manage.py
 

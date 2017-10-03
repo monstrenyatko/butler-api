@@ -23,8 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #  https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # The secret key must be a large random value and it must be kept secret
-with open(os.environ.get('BUTLER_API_DJANGO_SECRET_KEY_FILE'),'r') as f:
-    SECRET_KEY = f.read().replace('\n', '')
+SECRET_KEY = os.environ.get('BUTLER_API_DJANGO_SECRET_KEY')
 
 # Disabled debug mode by default
 DEBUG = bool(os.environ.get('DEBUG', False))
@@ -126,15 +125,12 @@ WSGI_APPLICATION = 'butler_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-with open(os.environ.get('BUTLER_DB_PASSWORD_FILE'),'r') as f:
-    DB_PASSWORD = f.read().replace('\n', '')
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.environ.get('BUTLER_DB_NAME'),
         'USER': os.environ.get('BUTLER_DB_USER'),
-        'PASSWORD': DB_PASSWORD,
+        'PASSWORD': os.environ.get('BUTLER_DB_PASSWORD'),
         'HOST': os.environ.get('BUTLER_DB_HOST'),
         'PORT': '',
         'OPTIONS': {
@@ -203,6 +199,9 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_HSTS_SECONDS = 0
 AUTH_TIME_INTERVAL = timedelta(minutes=15)
 APP_DATA_CERT_DIR = os.path.join(os.environ.get('BUTLER_HOME'), 'cert')
+APP_DATA_CERT_KEY_FILE_UID = int(os.environ.get('BUTLER_CERT_KEY_UID', -1))
+APP_DATA_CERT_KEY_FILE_GID = int(os.environ.get('BUTLER_CERT_KEY_GID', -1))
+APP_DATA_CERT_KEY_FILE_MODE = int(os.environ.get('BUTLER_CERT_KEY_MODE','660'), 8)
 APP_DATA_FW_DIR = os.path.join(os.environ.get('BUTLER_HOME'), 'fw')
 
 
