@@ -21,7 +21,11 @@ class FirmwareUpdateView(views.APIView):
         verify_secure(request)
         if not request.user.profile.is_device:
             raise rest_exceptions.NotAcceptable('Only for devices')
-        assignment = request.user.firmware
+        assignment = None
+        try:
+            assignment = request.user.firmware
+        except local_models.FirmwareAssignmentModel.DoesNotExist:
+            raise rest_exceptions.NotFound({'firmware': 'Not available'})
         if assignment.value.hardware == local_models.FirmwareModel.HW_ESP8266_4MB:
             return esp8266.update(request, assignment)
         else:
@@ -41,7 +45,11 @@ class FirmwareUpdateAnonymousView(views.APIView):
             raise rest_exceptions.NotFound({username: 'Not found'})
         if not user.profile.is_device:
             raise rest_exceptions.NotAcceptable('Only for devices')
-        assignment = user.firmware
+        assignment = None
+        try:
+            assignment = user.firmware
+        except local_models.FirmwareAssignmentModel.DoesNotExist:
+            raise rest_exceptions.NotFound({'firmware': 'Not available'})
         if assignment.value.hardware == local_models.FirmwareModel.HW_ESP8266_4MB:
             return esp8266.update(request, assignment)
         else:
