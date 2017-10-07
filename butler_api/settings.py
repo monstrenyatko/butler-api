@@ -59,6 +59,11 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
+        'django.template': {
+            'handlers': ['console'],
+            'level': os.environ.get('BUTLER_API_DJANGO_TEMPLATE_LOG_LEVEL', 'INFO'),
+            'propagate': True,
+        },
         'django.request': {
             'handlers': ['console'],
             'level': os.environ.get('BUTLER_API_DJANGO_REQ_LOG_LEVEL', 'INFO'),
