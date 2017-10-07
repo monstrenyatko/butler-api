@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_swagger',
     'auth_manager.apps.AuthManagerConfig',
     'fw_manager.apps.FwManagerConfig',
     'cert_manager.apps.CertManagerConfig',
@@ -192,6 +193,22 @@ REST_FRAMEWORK = {
     )
 }
 
+
+# Django REST Swagger
+# https://django-rest-swagger.readthedocs.io
+SWAGGER_SETTINGS = {
+    'is_authenticated': True,  # Enforce user authentication
+    'is_superuser': False,  # Admin only access
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': 'API Key format: token <token-value>',
+        }
+    },
+}
 
 # Other settings
 

@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from rest_framework_swagger.views import get_swagger_view
 
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^doc/', get_swagger_view(title='BUTLER API')),
     url(r'^auth/', include('auth_manager.urls')),
     url(r'^fw/', include('fw_manager.urls')),
     url(r'^cert/', include('cert_manager.urls')),
