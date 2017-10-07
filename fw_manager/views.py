@@ -15,7 +15,7 @@ from . import serializers as local_serializers
 from . import models as local_models
 
 
-class FirmwareUpdateView(views.APIView):
+class FirmwareUpdateView(generics.GenericAPIView):
     """ Provides the firmware if the update is required """
     def get(self, request):
         verify_secure(request)
@@ -32,7 +32,7 @@ class FirmwareUpdateView(views.APIView):
             raise rest_exceptions.NotAcceptable('The [{:s}] is not supported'.format(assignment.value.hardware))
 
 
-class FirmwareUpdateAnonymousView(views.APIView):
+class FirmwareUpdateAnonymousView(generics.GenericAPIView):
     permission_classes = (rest_permissions.AllowAny,)
 
     """ Provides the firmware if the update is required for not secure connection """

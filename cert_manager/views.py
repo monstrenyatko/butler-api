@@ -2,7 +2,6 @@ import os
 from django import http
 from django.conf import settings
 from rest_framework import generics
-from rest_framework import views
 from rest_framework import exceptions
 from rest_framework import permissions as rest_permissions
 from auth_manager.utils import verify_secure
@@ -24,7 +23,7 @@ class CertificateFingerprintView(generics.ListAPIView):
         return res
 
 
-class ClientCertificateView(views.APIView):
+class ClientCertificateView(generics.GenericAPIView):
     """ Provides the client certificates """
     def get(self, request, *args, **kwargs):
         verify_secure(request)
@@ -45,7 +44,7 @@ class ClientCertificateView(views.APIView):
         return response
 
 
-class CaCertificateView(views.APIView):
+class CaCertificateView(generics.GenericAPIView):
     permission_classes = (rest_permissions.AllowAny,)
     """ Provides the CA certificate """
     def get(self, request, *args, **kwargs):

@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.conf import settings
 from rest_framework import generics
 from rest_framework import renderers
-from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import exceptions
@@ -73,7 +73,7 @@ class DeviceDetailView(UserDetailView):
         return get_device_serializer_context(super().get_serializer_context())
 
 
-class EnableAuthView(APIView):
+class EnableAuthView(GenericAPIView):
     permission_classes = (rest_permissions.IsAdminUser,)
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = local_serializers.EnableAuthSerializer
