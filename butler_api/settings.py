@@ -89,6 +89,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'session_security',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_swagger',
@@ -105,6 +106,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'session_security.middleware.SessionSecurityMiddleware',
 ]
 
 ROOT_URLCONF = 'butler_api.urls'
@@ -112,7 +114,9 @@ ROOT_URLCONF = 'butler_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'butler_api', 'templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -220,6 +224,9 @@ SWAGGER_SETTINGS = {
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SECURITY_WARN_AFTER = int(os.environ.get('BUTLER_SESSION_SECURITY_WARN_AFTER', 540))
+SESSION_SECURITY_EXPIRE_AFTER = int(os.environ.get('BUTLER_SESSION_SECURITY_EXPIRE_AFTER', 600))
 CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True

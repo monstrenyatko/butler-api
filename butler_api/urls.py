@@ -19,6 +19,7 @@ from rest_framework_swagger.views import get_swagger_view
 
 
 urlpatterns = [
+    url(r'^session_security/', include('session_security.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^doc/', get_swagger_view(title='BUTLER API')),
     url(r'^auth/', include('auth_manager.urls')),

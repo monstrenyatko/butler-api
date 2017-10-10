@@ -1,0 +1,38 @@
+{% extends 'admin/base_site.html' %}
+
+{% block branding %}
+	{{ block.super }}
+	<div id="session_security">
+	{% block session_security %}
+		{% load session_security_tags %}
+		{% load i18n l10n %}
+		{% load static from staticfiles %}
+		{# If the user is not authenticated then there is no session to secure ! #}
+		{% if request.user.is_authenticated %}
+			<!-- Add expiration warning dialog style -->
+			<link rel="stylesheet" type="text/css" href="{% static 'session_security/style.css' %}">
+			<!-- Add expiration warning dialog -->
+			{% include 'session_security/dialog.html' %}
+			<!-- Init  JQuery -->
+			<script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+			<script type="text/javascript" src="{% static 'admin/js/jquery.init.js' %}"></script>
+			<!-- Init session_security JQuery -->
+			<script type="text/javascript" src="{% static 'session_security/script.js' %}"></script>
+			{% localize off %}
+				<script type="text/javascript">
+						var $ = django.jQuery;
+						$(document).ready(function() {
+							var sessionSecurity = new yourlabs.SessionSecurity({
+								pingUrl: '{% url 'session_security_ping' %}',
+								warnAfter: {{ request|warn_after|unlocalize }},
+								expireAfter: {{ request|expire_after|unlocalize }},
+								confirmFormDiscard: "{% trans 'You have unsaved changes in a form of this page.' %}"
+							});
+						});
+				</script>
+			{% endlocalize %}
+		{% endif %}
+	{% endblock %}
+	</div>
+	<!-- END session_security -->
+{% endblock %}

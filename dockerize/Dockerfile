@@ -22,6 +22,7 @@ RUN buildDeps='build-base mariadb-dev python3-dev'; \
     pip3 install \
     django \
     djangorestframework \
+    django-session-security \
     django-rest-swagger \
     gunicorn==19.6.0 \
     mysqlclient \
