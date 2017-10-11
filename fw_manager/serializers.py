@@ -45,5 +45,14 @@ class FirmwareAssignmentCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Is not the device')
         return u
 
+    def create(self, validated_data):
+        if local_models.FirmwareAssignmentModel.objects.filter(
+                user__username=validated_data['user']
+        ).exists():
+            raise serializers.ValidationError(
+                'Another assigment already available for the [{}]'.format(validated_data['user'])
+            )
+        return super().create(validated_data)
+
 class FirmwareUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
