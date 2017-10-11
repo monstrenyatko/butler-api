@@ -2,7 +2,6 @@ import os
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from rest_framework import views
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
@@ -57,9 +56,10 @@ class FirmwareUpdateAnonymousView(generics.GenericAPIView):
             raise rest_exceptions.NotAcceptable('The [{:s}] is not supported'.format(assignment.value.hardware))
 
 
-class FirmwareUploadView(views.APIView):
+class FirmwareUploadView(generics.GenericAPIView):
     permission_classes = (rest_permissions.IsAdminUser,)
     parser_classes = (rest_parsers.FileUploadParser,)
+    serializer_class = local_serializers.FirmwareUploadSerializer
 
     def put(self, request, filename):
         """ Uploads the firmware file to the storage """

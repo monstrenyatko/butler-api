@@ -44,3 +44,6 @@ class FirmwareAssignmentCreateSerializer(serializers.ModelSerializer):
         if not u.profile.is_device:
             raise serializers.ValidationError('Is not the device')
         return u
+
+class FirmwareUploadSerializer(serializers.Serializer):
+    file = serializers.FileField()
