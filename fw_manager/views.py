@@ -16,8 +16,9 @@ from . import models as local_models
 
 
 class FirmwareUpdateView(generics.GenericAPIView):
-    """ Provides the firmware if the update is required """
+
     def get(self, request):
+        """ Provides the firmware if the update is required """
         verify_secure(request)
         if not request.user.profile.is_device:
             raise rest_exceptions.NotAcceptable('Only for devices')
@@ -35,8 +36,8 @@ class FirmwareUpdateView(generics.GenericAPIView):
 class FirmwareUpdateAnonymousView(generics.GenericAPIView):
     permission_classes = (rest_permissions.AllowAny,)
 
-    """ Provides the firmware if the update is required for not secure connection """
     def get(self, request, **kwargs):
+        """ Provides the firmware if the update is required for not secure connection """
         username = kwargs['username']
         user = None
         try:
@@ -60,8 +61,8 @@ class FirmwareUploadView(views.APIView):
     permission_classes = (rest_permissions.IsAdminUser,)
     parser_classes = (rest_parsers.FileUploadParser,)
 
-    """ Uploads the firmware file to the storage """
     def put(self, request, filename):
+        """ Uploads the firmware file to the storage """
         verify_secure(request)
         try:
             local_models.FirmwareModel.NameValidator(filename)
@@ -84,13 +85,13 @@ class FirmwareListView(generics.ListCreateAPIView):
     queryset = local_models.FirmwareModel.objects.all()
     serializer_class = local_serializers.FirmwareSerializer
 
-    """ Retrieves the list of firmwares """
     def get(self, request, *args, **kwargs):
+        """ Retrieves the list of firmwares """
         verify_secure(request)
         return super().get(request, args, kwargs)
 
-    """ Creates the new firmware """
     def post(self, request, *args, **kwargs):
+        """ Creates the new firmware """
         verify_secure(request)
         return super().post(request, args, kwargs)
 
@@ -107,23 +108,23 @@ class FirmwareDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = local_serializers.FirmwareSerializer
     lookup_field = 'name'
 
-    """ Retrieves details about the specific firmware """
     def get(self, request, *args, **kwargs):
+        """ Retrieves details about the specific firmware """
         verify_secure(request)
         return super().get(request, args, kwargs)
 
-    """ Updating the specific firmware """
     def put(self, request, *args, **kwargs):
+        """ Updating the specific firmware """
         verify_secure(request)
         return super().put(request, args, kwargs)
 
-    """ Partially updating the specific firmware """
     def patch(self, request, *args, **kwargs):
+        """ Partially updating the specific firmware """
         verify_secure(request)
         return super().patch(request, args, kwargs)
 
-    """ Deletes the specific firmware """
     def delete(self, request, *args, **kwargs):
+        """ Deletes the specific firmware """
         verify_secure(request)
         return super().delete(request, args, kwargs)
 
@@ -133,13 +134,13 @@ class FirmwareAssignmentListView(generics.ListCreateAPIView):
     queryset = local_models.FirmwareAssignmentModel.objects.all()
     serializer_class = local_serializers.FirmwareAssignmentSerializer
 
-    """ Retrieves the list of firmware assignments """
     def get(self, request, *args, **kwargs):
+        """ Retrieves the list of firmware assignments """
         verify_secure(request)
         return super().get(request, args, kwargs)
 
-    """ Creates the new firmware assignment """
     def post(self, request, *args, **kwargs):
+        """ Creates the new firmware assignment """
         verify_secure(request)
         return super().post(request, args, kwargs)
 
@@ -154,23 +155,23 @@ class FirmwareAssignmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (rest_permissions.IsAdminUser,)
     serializer_class = local_serializers.FirmwareAssignmentSerializer
 
-    """ Retrieves details about the specific firmware assignment """
     def get(self, request, *args, **kwargs):
+        """ Retrieves details about the specific firmware assignment """
         verify_secure(request)
         return super().get(request, args, kwargs)
 
-    """ Updating the specific firmware assignment """
     def put(self, request, *args, **kwargs):
+        """ Updating the specific firmware assignment """
         verify_secure(request)
         return super().put(request, args, kwargs)
 
-    """ Partially updating the specific firmware assignment """
     def patch(self, request, *args, **kwargs):
+        """ Partially updating the specific firmware assignment """
         verify_secure(request)
         return super().patch(request, args, kwargs)
 
-    """ Deletes the specific firmware assignment """
     def delete(self, request, *args, **kwargs):
+        """ Deletes the specific firmware assignment """
         verify_secure(request)
         return super().delete(request, args, kwargs)
 
