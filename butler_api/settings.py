@@ -209,6 +209,7 @@ SWAGGER_SETTINGS = {
     'is_authenticated': True,  # Enforce user authentication
     'is_superuser': False,  # Admin only access
     'USE_SESSION_AUTH': False,
+    'VALIDATOR_URL': None,
     'SECURITY_DEFINITIONS': {
         'api_key': {
             'type': 'apiKey',
