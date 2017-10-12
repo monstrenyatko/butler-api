@@ -18,6 +18,7 @@ OPENSSL_CS_DIR_NAME = 'srv'
 OPENSSL_CC_DIR_NAME = 'clt'
 OPENSSL_C_RENEWED_DIR_NAME = 'next'
 OPENSSL_CA_PRIVATE_DIR_NAME = OPENSSL_CA_DIR_NAME + '-private'
+OPENSSL_CA_DEFAULT_CN = 'Butler Certification Authority'
 OPENSSL_CS_DEFAULT_HOSTNAME = 'butler'
 OPENSSL_CA_DEFAULT_DAYS = 3650
 OPENSSL_CS_DEFAULT_DAYS = 365
@@ -160,7 +161,7 @@ def gen_c(path, path_out, hostname, days):
 def gen_ca(path, days=OPENSSL_CA_DEFAULT_DAYS):
     prepare_dir(make_ca_dir_path(path))
     prepare_dir(make_ca_private_dir_path(path))
-    config = make_config_file('CA')
+    config = make_config_file(OPENSSL_CA_DEFAULT_CN)
     openssl('req', '-nodes' ,'-new',
             '-newkey', 'rsa:{}'.format(OPENSSL_KEY_SIZE),
             '-x509', '-extensions', 'v3_ca', '-days', str(days),
