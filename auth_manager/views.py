@@ -24,13 +24,13 @@ class UserListView(generics.ListCreateAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = local_serializers.UserSerializer
 
-    """ Retrieves the list of users """
     def get(self, request, *args, **kwargs):
+        """ Retrieves the list of users """
         verify_secure(request)
         return super().get(request, args, kwargs)
 
-    """ Creates the new user """
     def post(self, request, *args, **kwargs):
+        """ Creates the new user """
         verify_secure(request)
         return super().post(request, args, kwargs)
 
@@ -46,13 +46,13 @@ class UserDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = local_serializers.UserSerializer
     lookup_field = 'username'
 
-    """ Retrieves details about the specific user """
     def get(self, request, *args, **kwargs):
+        """ Retrieves details about the specific user """
         verify_secure(request)
         return super().get(request, args, kwargs)
 
-    """ Deletes the specific user """
     def delete(self, request, *args, **kwargs):
+        """ Deletes the specific user """
         verify_secure(request)
         return super().delete(request, args, kwargs)
 
@@ -61,6 +61,14 @@ class DeviceListView(UserListView):
     queryset = get_user_model().objects.filter(profile__is_device=True)
     serializer_class = local_serializers.DeviceSerializer
 
+    def get(self, request, *args, **kwargs):
+        """ Retrieves the list of devices """
+        return super().get(request, args, kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """ Creates the new device """
+        return super().post(request, args, kwargs)
+
     def get_serializer_context(self):
         return get_device_serializer_context(super().get_serializer_context())
 
@@ -68,6 +76,14 @@ class DeviceListView(UserListView):
 class DeviceDetailView(UserDetailView):
     queryset = get_user_model().objects.filter(profile__is_device=True)
     serializer_class = local_serializers.DeviceSerializer
+
+    def get(self, request, *args, **kwargs):
+        """ Retrieves details about the specific device """
+        return super().get(request, args, kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        """ Deletes the specific device """
+        return super().delete(request, args, kwargs)
 
     def get_serializer_context(self):
         return get_device_serializer_context(super().get_serializer_context())
@@ -78,8 +94,8 @@ class EnableAuthView(GenericAPIView):
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = local_serializers.EnableAuthSerializer
 
-    """ Enables the authentication """
     def post(self, request):
+        """ Enables the authentication """
         verify_secure(request)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -93,8 +109,8 @@ class EnableAuthView(GenericAPIView):
 
 class GetAuthTokenView(rest_view.ObtainAuthToken):
 
-    """ Returns the access token """
     def post(self, request):
+        """ Returns the access token """
         verify_secure(request)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -24,8 +24,9 @@ class CertificateFingerprintView(generics.ListAPIView):
 
 
 class ClientCertificateView(generics.GenericAPIView):
-    """ Provides the client certificates """
+
     def get(self, request, *args, **kwargs):
+        """ Provides the client certificates """
         verify_secure(request)
         username = request.user.username
         name = kwargs['name'].lower()
@@ -46,8 +47,9 @@ class ClientCertificateView(generics.GenericAPIView):
 
 class CaCertificateView(generics.GenericAPIView):
     permission_classes = (rest_permissions.AllowAny,)
-    """ Provides the CA certificate """
+
     def get(self, request, *args, **kwargs):
+        """ Provides the CA certificate """
         verify_secure(request)
         form = kwargs.get('form', 'pem').lower()
         stream = None
