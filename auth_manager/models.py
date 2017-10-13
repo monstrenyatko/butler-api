@@ -12,3 +12,8 @@ class UserProfileModel(models.Model):
 
     class Meta:
         db_table = 'user_profile'
+        verbose_name = 'user profile'
+        verbose_name_plural = 'user profiles'
+
+    def __str__(self):
+        return self.user.username
