@@ -35,6 +35,9 @@ class UserProfileModelAdmin(admin.ModelAdmin):
         ))
     get_user_link.short_description = 'user'
 
+    def has_add_permission(self, request):
+        return False
+
 
 class UserModelAdmin(DjangoUserAdmin):
     list_select_related = ('profile',)
@@ -96,6 +99,9 @@ class TokenModelAdmin(admin.ModelAdmin):
             url, obj.user.username
         ))
     get_user_link.short_description = 'user'
+
+    def has_add_permission(self, request):
+        return False
 
 
 admin.site.unregister(get_user_model())
