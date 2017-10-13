@@ -21,9 +21,11 @@ class FirmwareModel(models.Model):
 
     class Meta:
         db_table = 'firmware'
+        verbose_name = 'firmware'
+        verbose_name_plural = 'firmwares'
 
     def __str__(self):
-        return '{} {}'.format(self.name, self.hardware)
+        return '{}<{}>'.format(self.name, self.hardware)
 
 
 class FirmwareAssignmentModel(models.Model):
@@ -42,6 +44,8 @@ class FirmwareAssignmentModel(models.Model):
 
     class Meta:
         db_table = 'firmware_assignment'
+        verbose_name = 'firmware assignment'
+        verbose_name_plural = 'firmware assignments'
 
     def __str__(self):
-        return '{} {}'.format(self.user, self.value)
+        return '{}<->{}'.format(self.user, self.value)
