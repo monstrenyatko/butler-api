@@ -9,6 +9,8 @@ class CertificateFingerprintModel(models.Model):
     class Meta:
         db_table = 'cert_fingerprint'
         ordering = ['created']
- 
+        verbose_name = 'certificate fingerprint'
+        verbose_name_plural = 'certificate fingerprints'
+
     def __str__(self):
-        return '{} {} {}'.format(self.name, self.value, self.created)
+        return self.value
