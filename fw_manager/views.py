@@ -1,9 +1,4 @@
-import os
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework import generics
 from rest_framework import permissions as rest_permissions
 from rest_framework import exceptions as rest_exceptions
@@ -56,33 +51,10 @@ class FirmwareUpdateAnonymousView(generics.GenericAPIView):
             raise rest_exceptions.NotAcceptable('The [{:s}] is not supported'.format(assignment.value.hardware))
 
 
-class FirmwareUploadView(generics.GenericAPIView):
-    permission_classes = (rest_permissions.IsAdminUser,)
-    parser_classes = (rest_parsers.FileUploadParser,)
-    serializer_class = local_serializers.FirmwareUploadSerializer
-
-    def put(self, request, filename):
-        """ Uploads the firmware file to the storage """
-        verify_secure(request)
-        try:
-            local_models.FirmwareModel.NameValidator(filename)
-        except ValidationError as e:
-            raise rest_exceptions.ValidationError({filename:list(e)})
-        out_dir = settings.APP_DATA_FW_DIR
-        os.makedirs(out_dir, exist_ok=True)
-        if not os.access(out_dir, os.W_OK):
-            raise rest_exceptions.APIException('The [{:s}] is not writable'.format(out_dir))
-        out_path = os.path.join(out_dir, filename)
-        file_obj = request.data['file']
-        with open(out_path, 'wb') as out_file:
-            for chunk in file_obj.chunks():
-                out_file.write(chunk)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class FirmwareListView(generics.ListCreateAPIView):
     permission_classes = (rest_permissions.IsAdminUser,)
     queryset = local_models.FirmwareModel.objects.all()
+    parser_classes = (rest_parsers.MultiPartParser, rest_parsers.FormParser,)
     serializer_class = local_serializers.FirmwareSerializer
 
     def get(self, request, *args, **kwargs):
@@ -95,16 +67,11 @@ class FirmwareListView(generics.ListCreateAPIView):
         verify_secure(request)
         return super().post(request, args, kwargs)
 
-    def get_serializer_class(self):
-        res = self.serializer_class
-        if self.request.method == 'POST':
-            res = local_serializers.FirmwareCreateSerializer
-        return res
-
 
 class FirmwareDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (rest_permissions.IsAdminUser,)
     queryset = local_models.FirmwareModel.objects.all()
+    parser_classes = (rest_parsers.MultiPartParser, rest_parsers.FormParser,)
     serializer_class = local_serializers.FirmwareSerializer
     lookup_field = 'name'
 

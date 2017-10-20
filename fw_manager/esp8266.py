@@ -46,11 +46,11 @@ def verifyRequest(request, assignment):
 def update(request, assignment):
     """ Provides the ESP8266 firmware if the update is required """
     verifyRequest(request, assignment)
-    # Filename is equal to firmware name
-    file_name = assignment.value.name
-    file_path = os.path.join(settings.APP_DATA_FW_DIR, file_name)
+    file_name_rel = assignment.value.file.name
+    file_path = os.path.join(settings.APP_DATA_FW_ROOT, file_name_rel)
+    file_name = os.path.basename(file_name_rel)
     if not os.path.isfile(file_path):
-        raise rest_exceptions.NotFound({'file': 'The [{:s}] is not found'.format(file_name)})
+        raise rest_exceptions.NotFound({'file': 'The [{:s}] is not found'.format(file_name_rel)})
     # Verifying that update is required
     file_md5 = md5(file_path)
     if request.META['HTTP_X_ESP8266_SKETCH_MD5'] == file_md5:

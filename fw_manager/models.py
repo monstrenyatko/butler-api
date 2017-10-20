@@ -1,6 +1,11 @@
+import os
 from django.conf import settings
 from django.db import models
 from django.core.validators import RegexValidator
+
+
+def get_firmware_file_name(obj, filename):
+    return os.path.join(settings.APP_DATA_FW_SUBDIR, str(obj.pk))
 
 
 class FirmwareModel(models.Model):
@@ -15,9 +20,11 @@ class FirmwareModel(models.Model):
         (HW_ESP8266_4MB, 'ESP8266 with 4MB flash'),
     )
 
-    name = models.CharField(max_length=150, primary_key=True, validators=[NameValidator])
+    name = models.CharField(max_length=50, unique=True, validators=[NameValidator])
     hardware = models.CharField(max_length=50, choices=HW_CHOICES)
     description = models.TextField(max_length=250, blank=True)
+    file = models.FileField(upload_to=get_firmware_file_name)
+    upload_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'firmware'

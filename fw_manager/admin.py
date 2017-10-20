@@ -5,10 +5,16 @@ from . import models as local_models
 
 
 class FirmwareModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'hardware', 'description',)
+    list_display = ('name', 'hardware', 'description', 'upload_date', 'get_file_link',)
     ordering = ('name',)
     search_fields = ('name', 'description',)
     list_filter = ('hardware',)
+
+    def get_file_link(self, obj):
+        return mark_safe('<a href="{}">{}</a>'.format(
+            obj.file.url, 'download'
+        ))
+    get_file_link.short_description = 'file'
 
 
 class FirmwareAssignmentModelAdmin(admin.ModelAdmin):

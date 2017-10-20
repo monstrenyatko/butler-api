@@ -221,11 +221,16 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_HSTS_SECONDS = 0
 AUTH_TIME_INTERVAL = timedelta(minutes=15)
-APP_DATA_CERT_DIR = os.path.join(os.environ.get('BUTLER_HOME'), 'cert')
+MEDIA_ROOT = os.environ.get('BUTLER_MEDIA', os.path.join(os.environ.get('BUTLER_HOME'), 'media'))
+MEDIA_URL = '/media/'
+APP_DATA_CERT_ROOT = MEDIA_ROOT
+APP_DATA_CERT_SUBDIR = 'cert'
+APP_DATA_CERT_DIR = os.path.join(APP_DATA_CERT_ROOT, APP_DATA_CERT_SUBDIR)
 APP_DATA_CERT_KEY_FILE_UID = int(os.environ.get('BUTLER_CERT_KEY_UID', -1))
 APP_DATA_CERT_KEY_FILE_GID = int(os.environ.get('BUTLER_CERT_KEY_GID', -1))
 APP_DATA_CERT_KEY_FILE_MODE = int(os.environ.get('BUTLER_CERT_KEY_MODE','660'), 8)
-APP_DATA_FW_DIR = os.path.join(os.environ.get('BUTLER_HOME'), 'fw')
+APP_DATA_FW_ROOT = MEDIA_ROOT
+APP_DATA_FW_SUBDIR = 'fw'
 
 
 # Load external config if required

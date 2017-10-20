@@ -40,7 +40,7 @@ fi
 if [ "$1" = 'django-apps' ]; then
 	shift;
 	manage.py migrate
-	chown -R $APP_USERNAME:$APP_USERNAME /butler-api $BUTLER_HOME
+	chown -R $APP_USERNAME:$APP_USERNAME /butler-api $BUTLER_HOME $BUTLER_MEDIA
 	exec /app-entrypoint.sh gunicorn "$@"
 fi
 

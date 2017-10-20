@@ -6,16 +6,7 @@ from . import models as local_models
 class FirmwareSerializer(serializers.ModelSerializer):
     class Meta:
         model = local_models.FirmwareModel
-        fields = ('name', 'hardware', 'description')
-        extra_kwargs = {
-            'name': {'read_only': True},
-        }
-
-
-class FirmwareCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = local_models.FirmwareModel
-        fields = ('name', 'hardware', 'description')
+        fields = ('name', 'hardware', 'description', 'file',)
 
 
 class FirmwareAssignmentSerializer(serializers.ModelSerializer):
@@ -50,9 +41,6 @@ class FirmwareAssignmentCreateSerializer(serializers.ModelSerializer):
                 user__username=validated_data['user']
         ).exists():
             raise serializers.ValidationError(
-                'Another assigment already available for the [{}]'.format(validated_data['user'])
+                'Another assignment already available for the [{}]'.format(validated_data['user'])
             )
         return super().create(validated_data)
-
-class FirmwareUploadSerializer(serializers.Serializer):
-    file = serializers.FileField()
