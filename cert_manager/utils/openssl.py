@@ -231,16 +231,16 @@ def update_server_fingerprint(path, hostname=OPENSSL_CS_DEFAULT_HOSTNAME):
         (Q(name = hostname) & ~Q(value = fp_current) & ~Q(value = fp_next))
     ).delete()
 
-def get_client_stream(path, hostname, name, form=OPENSSL_C_FORM_PEM):
-    # verify name value
-    if not name in [OPENSSL_C_NAME_CRT, OPENSSL_C_NAME_KEY]:
-        raise Exception('The [{:s}] is not supported'.format(name))
+def get_client_stream(path, hostname, ext, form=OPENSSL_C_FORM_PEM):
+    # verify ext value
+    if not ext in [OPENSSL_C_NAME_CRT, OPENSSL_C_NAME_KEY]:
+        raise Exception('The [{:s}] is not supported'.format(ext))
     # verify form value
     if not form in [OPENSSL_C_FORM_PEM, OPENSSL_C_FORM_DER]:
         raise Exception('The [{:s}] is not supported'.format(form))
     # prepare file path/name
     path_dir = os.path.join(path, OPENSSL_CC_DIR_NAME, hostname)
-    path_file = make_c_file_name(path_dir, hostname, name, form)
+    path_file = make_c_file_name(path_dir, hostname, ext, form)
     return open_cert_stream(path_file)
 
 def get_ca_crt_stream(path, form=OPENSSL_C_FORM_PEM):

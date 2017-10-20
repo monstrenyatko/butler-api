@@ -16,7 +16,7 @@ class CertificateFingerprintView(generics.ListAPIView):
     serializer_class = local_serializers.CertificateFingerprintSerializer
 
     def get_queryset(self):
-        name = self.kwargs['name']
+        name = self.kwargs['host']
         res = local_models.CertificateFingerprintModel.objects.filter(name=name)
         if not len(res):
             raise exceptions.NotFound(detail='[{}] is not found'.format(name))
@@ -29,19 +29,19 @@ class ClientCertificateView(generics.GenericAPIView):
         """ Provides the client certificates """
         verify_secure(request)
         username = request.user.username
-        name = kwargs['name'].lower()
+        ext = kwargs['type'].lower()
         form = kwargs.get('form', 'pem').lower()
         stream = None
         try:
-            stream = openssl.get_client_stream(settings.APP_DATA_CERT_DIR, username, name, form)
+            stream = openssl.get_client_stream(settings.APP_DATA_CERT_DIR, username, ext, form)
         except Exception as e:
             raise exceptions.NotFound(e)
         if not stream:
-            raise exceptions.NotFound(detail='[{}:{}:{}] is not found'.format(username, name, form))
+            raise exceptions.NotFound(detail='[{}:{}:{}] is not found'.format(username, ext, form))
         response = http.FileResponse(stream)
         response['Content-Type'] = 'application/octet-stream'
         response['Content-Length'] = os.fstat(stream.fileno()).st_size
-        response['Content-Disposition'] = "attachment; filename={}.{}".format(name, form)
+        response['Content-Disposition'] = "attachment; filename={}.{}".format(ext, form)
         return response
 
 
