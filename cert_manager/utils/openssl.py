@@ -201,6 +201,9 @@ def gen_client(path, hostname, days=OPENSSL_CC_DEFAULT_DAYS):
             '-in', make_c_file_name(path_out, hostname, OPENSSL_C_NAME_KEY),
             '-out', make_c_file_name(path_out, hostname, OPENSSL_C_NAME_KEY, OPENSSL_C_FORM_DER),
     )
+    # update permissions
+    set_cert_key_mode(make_c_file_name(path_out, hostname, OPENSSL_C_NAME_KEY, OPENSSL_C_FORM_DER))
+    set_cert_key_owner(make_c_file_name(path_out, hostname, OPENSSL_C_NAME_KEY, OPENSSL_C_FORM_DER))
 
 def rotate_server(path, hostname=OPENSSL_CS_DEFAULT_HOSTNAME):
     path_in = os.path.join(path, OPENSSL_CS_DIR_NAME, hostname, OPENSSL_C_RENEWED_DIR_NAME)
