@@ -11,8 +11,10 @@ class FirmwareModelAdmin(admin.ModelAdmin):
     list_filter = ('hardware',)
 
     def get_file_link(self, obj):
-        return mark_safe('<a href="{}">{}</a>'.format(
-            obj.file.url, 'download'
+        return mark_safe('<a href="{}" download="{}">{}</a>'.format(
+            obj.file.url,
+            'fw_{}.bin'.format(obj.name),
+            'download',
         ))
     get_file_link.short_description = 'file'
 

@@ -1,11 +1,12 @@
 import os
+import uuid
 from django.conf import settings
 from django.db import models
 from django.core.validators import RegexValidator
 
 
 def get_firmware_file_name(obj, filename):
-    return os.path.join(settings.APP_DATA_FW_SUBDIR, str(obj.pk))
+    return os.path.join(settings.APP_DATA_FW_SUBDIR, uuid.uuid4().hex)
 
 
 class FirmwareModel(models.Model):
