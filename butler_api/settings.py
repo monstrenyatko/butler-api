@@ -231,6 +231,7 @@ APP_DATA_CERT_KEY_FILE_GID = int(os.environ.get('BUTLER_CERT_KEY_GID', -1))
 APP_DATA_CERT_KEY_FILE_MODE = int(os.environ.get('BUTLER_CERT_KEY_MODE','660'), 8)
 APP_DATA_FW_ROOT = MEDIA_ROOT
 APP_DATA_FW_SUBDIR = 'fw'
+APP_DATA_FW_UNUSED_DELAY = timedelta(minutes=5)
 
 
 # Load external config if required
