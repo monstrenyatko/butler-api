@@ -63,6 +63,16 @@ def mv_files(src, dst):
     for i in os.scandir(src):
         shutil.move(i.path, dst)
 
+def md5(file_path):
+    if os.path.isfile(file_path):
+        res = hashlib.md5()
+        with open(file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(4096), b""):
+                res.update(chunk)
+        return res.hexdigest()
+    else:
+        return None
+
 def open_cert_stream(path):
     if os.path.isfile(path):
         return open(path, 'rb')
@@ -231,7 +241,7 @@ def update_server_fingerprint(path, hostname=OPENSSL_CS_DEFAULT_HOSTNAME):
         (Q(name = hostname) & ~Q(value = fp_current) & ~Q(value = fp_next))
     ).delete()
 
-def get_client_stream(path, hostname, ext, form=OPENSSL_C_FORM_PEM):
+def get_client_file_path(path, hostname, ext, form):
     # verify ext value
     if not ext in [OPENSSL_C_NAME_CRT, OPENSSL_C_NAME_KEY]:
         raise Exception('The [{:s}] is not supported'.format(ext))
@@ -240,12 +250,26 @@ def get_client_stream(path, hostname, ext, form=OPENSSL_C_FORM_PEM):
         raise Exception('The [{:s}] is not supported'.format(form))
     # prepare file path/name
     path_dir = os.path.join(path, OPENSSL_CC_DIR_NAME, hostname)
-    path_file = make_c_file_name(path_dir, hostname, ext, form)
-    return open_cert_stream(path_file)
+    return make_c_file_name(path_dir, hostname, ext, form)
 
-def get_ca_crt_stream(path, form=OPENSSL_C_FORM_PEM):
+def get_ca_crt_file_path(path, form):
     # verify form value
     if not form in [OPENSSL_C_FORM_PEM, OPENSSL_C_FORM_DER]:
         raise Exception('The [{:s}] is not supported'.format(form))
-    path_file = make_ca_file_name(path, OPENSSL_C_NAME_CRT, form)
+    return make_ca_file_name(path, OPENSSL_C_NAME_CRT, form)
+
+def get_client_stream(path, hostname, ext, form=OPENSSL_C_FORM_PEM):
+    path_file = get_client_file_path(path, hostname, ext, form)
     return open_cert_stream(path_file)
+
+def get_ca_crt_stream(path, form=OPENSSL_C_FORM_PEM):
+    path_file = get_ca_crt_file_path(path, form)
+    return open_cert_stream(path_file)
+
+def get_client_md5(path, hostname, ext, form=OPENSSL_C_FORM_PEM):
+    path_file = get_client_file_path(path, hostname, ext, form)
+    return md5(path_file)
+
+def get_ca_crt_md5(path, form=OPENSSL_C_FORM_PEM):
+    path_file = get_ca_crt_file_path(path, form)
+    return md5(path_file)
