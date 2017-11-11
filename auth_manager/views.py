@@ -1,6 +1,8 @@
+import time
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.conf import settings
+from django import http
 from rest_framework import generics
 from rest_framework import renderers
 from rest_framework.generics import GenericAPIView
@@ -10,6 +12,7 @@ from rest_framework import exceptions
 from rest_framework.authtoken import views as rest_view
 from rest_framework.authtoken.models import Token
 from rest_framework import permissions as rest_permissions
+from jose import jwt
 from . import serializers as local_serializers
 from .utils import verify_secure
 
@@ -124,3 +127,21 @@ class GetAuthTokenView(rest_view.ObtainAuthToken):
         user.profile.is_auth_retrieved = True
         user.save()
         return Response({'token': user.auth_token.key})
+
+
+class GetJwtView(GenericAPIView):
+
+    def get(self, request):
+        """ Returns the JWT access token """
+        verify_secure(request)
+        user = request.user
+        content = jwt.encode(
+            {
+                'user': user.username,
+                'exp': int(time.time()) + settings.AUTH_JWT_EXPIRE_AFTER_SEC,
+            },
+            settings.SECRET_KEY, algorithm='HS256'
+        )
+        response = http.HttpResponse(content_type='application/jwt')
+        response.content = content
+        return response

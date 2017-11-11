@@ -26,6 +26,7 @@ RUN buildDeps='build-base mariadb-dev python3-dev'; \
     django-rest-swagger \
     gunicorn==19.6.0 \
     mysqlclient \
+    python-jose \
     && \
     apk del $buildDeps && \
     rm -rf /root/.cache && mkdir -p /root/.cache && \
