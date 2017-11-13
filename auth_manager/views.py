@@ -1,4 +1,5 @@
 import time
+import logging
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.conf import settings
@@ -12,10 +13,13 @@ from rest_framework import exceptions
 from rest_framework.authtoken import views as rest_view
 from rest_framework.authtoken.models import Token
 from rest_framework import permissions as rest_permissions
+from rest_framework import serializers as rest_serializers
 from jose import jwt
 from . import serializers as local_serializers
 from .utils import verify_secure
+from . import mqtt
 
+log = logging.getLogger(__name__)
 
 def get_device_serializer_context(serializer_context):
     serializer_context['is_device'] = True
@@ -140,8 +144,43 @@ class GetJwtView(GenericAPIView):
                 'user': user.username,
                 'exp': int(time.time()) + settings.AUTH_JWT_EXPIRE_AFTER_SEC,
             },
-            settings.SECRET_KEY, algorithm='HS256'
+            settings.SECRET_KEY, algorithm=settings.AUTH_JWT_ALGORITHM
         )
         response = http.HttpResponse(content_type='application/jwt')
         response.content = content
         return response
+
+
+class CheckMqttUserView(GenericAPIView):
+    permission_classes = (rest_permissions.AllowAny,)
+    serializer_class = rest_serializers.Serializer
+
+    def post(self, request):
+        """ Verifies MQTT user access """
+        if mqtt.checkMqttUser(request):
+            return http.HttpResponse()
+        else:
+            return http.HttpResponseForbidden()
+
+
+class CheckMqttSuperuserView(GenericAPIView):
+    permission_classes = (rest_permissions.AllowAny,)
+    serializer_class = rest_serializers.Serializer
+
+    def post(self, request):
+        """ Verifies MQTT superuser access """
+        if mqtt.checkMqttSuperuser(request):
+            return http.HttpResponse()
+        else:
+            return http.HttpResponseForbidden()
+
+
+class CheckMqttAclView(GenericAPIView):
+    permission_classes = (rest_permissions.AllowAny,)
+    serializer_class = rest_serializers.Serializer
+
+    def post(self, request):
+        """ Verifies MQTT ACL """
+        log.info(request.META)
+        log.info(request.data)
+        return http.HttpResponse()
