@@ -64,6 +64,11 @@ class UserSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', {})
+        # Verify the user name is not changed
+        if instance.username != validated_data.get('username', instance.username):
+            raise serializers.ValidationError({'username': [
+                    'You must not change this field.'
+            ]})
         # Update User
         super().update(instance, validated_data)
         # Update UserProfile
@@ -76,6 +81,7 @@ class UserSerializer(serializers.ModelSerializer):
 class DeviceSerializer(UserSerializer):
     class Meta(UserSerializer.Meta):
         fields = ('username', 'password', 'date_joined', 'auth_token', 'profile',)
+
 
 class EnableAuthSerializer(serializers.Serializer):
     username = serializers.CharField(label=_("Username"))

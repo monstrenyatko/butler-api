@@ -46,6 +46,11 @@ class UserModelAdmin(DjangoUserAdmin):
     readonly_fields = ('get_profile_link',)
     inlines = (UserProfileModelAdminInline,)
 
+    def get_readonly_fields(self, request, obj=None):
+        if obj: # editing an existing object
+            return ('username',) + self.readonly_fields
+        return self.readonly_fields
+
     def get_is_device(self, obj):
         return obj.profile.is_device
     get_is_device.short_description = 'is device'
