@@ -17,7 +17,6 @@ class TokenSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = local_models.UserProfileModel
         fields = ('is_device', 'is_auth_retrieved')

@@ -104,6 +104,58 @@ class TokenModelAdmin(admin.ModelAdmin):
         return False
 
 
+class MqttAclTemplateModelAdmin(admin.ModelAdmin):
+    list_display = ('name', 'template')
+    readonly_fields = list_display
+
+    def has_add_permission(self, request):
+        return False
+
+
+class MqttAclModelAdmin(admin.ModelAdmin):
+    list_select_related = ('user',)
+    list_display = ('get_user_link', 'get_topic_link', 'access',)
+    list_filter = ('access',)
+    ordering = ('user__username',)
+    search_fields = ('user__username', 'topic')
+    fields = ('topic', 'access',)
+    readonly_fields = ()
+
+    def get_fields(self, request, obj=None):
+        if obj: # editing an existing object
+            return ('get_user_link',) + self.fields
+        return ('user',) + self.fields
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj: # editing an existing object
+            return ('get_user_link',) + self.readonly_fields
+        return self.readonly_fields
+
+    def get_user_link(self, obj):
+        url = reverse('admin:{}_{}_change'.format(
+                obj.user._meta.app_label,
+                obj.user._meta.model_name
+            ),
+            args=[obj.user.pk]
+        )
+        return mark_safe('<a href="{}">{}</a>'.format(
+            url, obj.user.username
+        ))
+    get_user_link.short_description = 'user'
+
+    def get_topic_link(self, obj):
+        url = reverse('admin:{}_{}_change'.format(
+                obj._meta.app_label,
+                obj._meta.model_name
+            ),
+            args=[obj.pk]
+        )
+        return mark_safe('<a href="{}">{}</a>'.format(
+            url, obj.topic
+        ))
+    get_topic_link.short_description = 'topic'
+
+
 admin.site.unregister(get_user_model())
 admin.site.register(get_user_model(), UserModelAdmin)
 
@@ -111,3 +163,7 @@ admin.site.register(local_models.UserProfileModel, UserProfileModelAdmin)
 
 admin.site.unregister(Token)
 admin.site.register(Token, TokenModelAdmin)
+
+admin.site.register(local_models.MqttAclTemplateModel, MqttAclTemplateModelAdmin)
+
+admin.site.register(local_models.MqttAclModel, MqttAclModelAdmin)

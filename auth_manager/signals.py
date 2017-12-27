@@ -19,3 +19,14 @@ def create_user_token(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, created, **kwargs):
     if not created:
         instance.profile.save()
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_mqtt_acl(sender, instance, created, **kwargs):
+    if created:
+        acl_template = local_models.MqttAclTemplateModel.objects.get(name=local_models.MqttAclTemplateModel.NAME_USER_DEFAULT)
+        acl_topic = local_models.mqtt_acl_template_to_topic(acl_template.template, instance)
+        local_models.MqttAclModel.objects.create(
+            user=instance,
+            topic=acl_topic,
+            access=local_models.MqttAclModel.ACCESS_READ_WRITE,
+        )
