@@ -26,11 +26,11 @@ def getJwtDict(request):
         log.debug('JWT payload: {}'.format(result))
     return result
 
-def getJwtUser(jwtpayload):
+def getJwtUser(request):
     user = None
+    jwtpayload = getJwtDict(request)
     if jwtpayload:
         username = jwtpayload.get('user', None)
-        log.debug('JWT user, name: {}'.format(username))
         if username:
             try:
                 user = get_user_model().objects.get(username=username)
@@ -38,12 +38,11 @@ def getJwtUser(jwtpayload):
                 log.error('JWT user, name: {}, error: does not exist'.format(username))
     return user
 
-def getUser(request):
-    return getJwtUser(getJwtDict(request))
+def verifyUserAccess(user):
+    return user != None
 
-def checkMqttUser(request):
-    return getUser(request) != None
-
-def checkMqttSuperuser(request):
-    user = getUser(request)
+def verifySuperuserAccess(user):
     return (user and user.is_superuser)
+
+def verifyAcl(user, topic, access):
+    return True

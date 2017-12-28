@@ -157,10 +157,10 @@ class CheckMqttUserView(GenericAPIView):
 
     def post(self, request):
         """ Verifies MQTT user access """
-        if mqtt.checkMqttUser(request):
+        user = mqtt.getJwtUser(request)
+        if mqtt.verifyUserAccess(user):
             return http.HttpResponse()
-        else:
-            return http.HttpResponseForbidden()
+        return http.HttpResponseForbidden()
 
 
 class CheckMqttSuperuserView(GenericAPIView):
@@ -169,10 +169,10 @@ class CheckMqttSuperuserView(GenericAPIView):
 
     def post(self, request):
         """ Verifies MQTT superuser access """
-        if mqtt.checkMqttSuperuser(request):
+        user = mqtt.getJwtUser(request)
+        if mqtt.verifySuperuserAccess(user):
             return http.HttpResponse()
-        else:
-            return http.HttpResponseForbidden()
+        return http.HttpResponseForbidden()
 
 
 class CheckMqttAclView(GenericAPIView):
@@ -181,6 +181,13 @@ class CheckMqttAclView(GenericAPIView):
 
     def post(self, request):
         """ Verifies MQTT ACL """
-        log.info(request.META)
-        log.info(request.data)
-        return http.HttpResponse()
+        user = mqtt.getJwtUser(request)
+        if user and request.data:
+            data = request.data.dict()
+            log.debug('MQTT ACL check, data: {}'.format(data))
+            topic = data.get('topic')
+            access = data.get('acc')
+            if (topic is not None) and (access is not None):
+                if mqtt.verifyAcl(user, topic, access):
+                    return http.HttpResponse()
+        return http.HttpResponseForbidden()
