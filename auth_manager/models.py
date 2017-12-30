@@ -38,8 +38,12 @@ class MqttAclTemplateModel(models.Model):
     )
 
     NAME_USER_DEFAULT = 'USER_DEFAULT'
+    NAME_USER_DATA = 'USER_DATA'
+    NAME_USER_CONFIG = 'USER_CONFIG'
     NAME_CHOICES = (
         (NAME_USER_DEFAULT, 'USER DEFAULT'),
+        (NAME_USER_DATA, 'USER DATA'),
+        (NAME_USER_CONFIG, 'USER CONFIG'),
     )
 
     name = models.CharField(max_length=50, unique=True, choices=NAME_CHOICES, validators=[NameValidator])
