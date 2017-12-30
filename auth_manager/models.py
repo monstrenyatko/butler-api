@@ -31,9 +31,10 @@ class MqttAclTemplateModel(models.Model):
         'Only Alphanumeric characters, Hyphen and Underscore symbols are allowed'
     )
     TemplateValidator = RegexValidator(
-        r'^([0-9a-zA-Z\-_\/]|(%u))*$',
+        r'^([0-9a-zA-Z\-_\/]|(%u))*\/$',
         'Only Alphanumeric characters, Hyphen, Underscore, Forward-Slash symbols are allowed '
         'plus template arguments like: %u - user-name'
+        ' and must end with Forward-Slash symbol'
     )
 
     NAME_USER_DEFAULT = 'USER_DEFAULT'
@@ -63,8 +64,9 @@ class MqttAclModel(models.Model):
         (ACCESS_READ_WRITE, 'READ+WRITE'),
     )
     MqttAclTopicValidator = RegexValidator(
-        r'^([0-9a-zA-Z\-_\/])*$',
+        r'^([0-9a-zA-Z\-_\/])*\/$',
         'Only Alphanumeric characters, Hyphen, Underscore, Forward-Slash symbols are allowed'
+        ' and must end with Forward-Slash symbol'
     )
 
     user = models.ForeignKey(
