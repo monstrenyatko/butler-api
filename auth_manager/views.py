@@ -184,9 +184,9 @@ class CheckMqttAclView(GenericAPIView):
         user = mqtt.getJwtUser(request)
         if user and request.data:
             data = request.data.dict()
-            log.debug('MQTT ACL check, data: {}'.format(data))
+            log.debug('MQTT ACL check, data: %s', data)
             topic = data.get('topic')
-            access = data.get('acc')
+            access = int(data.get('acc'))
             if (topic is not None) and (access is not None):
                 if mqtt.verifyAcl(user, topic, access):
                     return http.HttpResponse()
