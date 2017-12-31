@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'auth_manager.apps.AuthManagerConfig',
     'fw_manager.apps.FwManagerConfig',
     'cert_manager.apps.CertManagerConfig',
+    'mqtt_manager.apps.MqttManagerConfig',
 ]
 
 MIDDLEWARE = [
