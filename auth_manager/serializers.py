@@ -16,10 +16,18 @@ class TokenSerializer(serializers.ModelSerializer):
         }
 
 
+class UserLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = local_models.UserLocationModel
+        fields = ('name',)
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
+    location = UserLocationSerializer(required=False)
+
     class Meta:
         model = local_models.UserProfileModel
-        fields = ('is_device', 'is_auth_retrieved')
+        fields = ('is_device', 'is_auth_retrieved', 'location')
         extra_kwargs = {
             'is_device': {'read_only': True},
             'is_auth_retrieved': {'read_only': True},

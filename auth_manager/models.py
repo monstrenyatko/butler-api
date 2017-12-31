@@ -3,6 +3,25 @@ from django.db import models
 from django.core.validators import RegexValidator
 
 
+class UserLocationModel(models.Model):
+    NameValidator = RegexValidator(
+        r'^[0-9a-zA-Z\-_]*$',
+        'Only Alphanumeric characters, Hyphen and Underscore symbols are allowed'
+    )
+
+    NAME_UNKNOWN = 'UNKNOWN'
+
+    name = models.CharField(max_length=50, unique=True, validators=[NameValidator])
+
+    class Meta:
+        db_table = 'user_location'
+        verbose_name = 'user location'
+        verbose_name_plural = 'user locations'
+
+    def __str__(self):
+        return self.name
+
+
 class UserProfileModel(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, related_name='profile',
@@ -10,6 +29,12 @@ class UserProfileModel(models.Model):
     )
     is_device = models.BooleanField(default=False)
     is_auth_retrieved = models.BooleanField(default=False)
+    location = models.ForeignKey(
+        UserLocationModel,
+        on_delete=models.PROTECT,
+        to_field='name',
+        default=UserLocationModel.NAME_UNKNOWN,
+    )
 
     class Meta:
         db_table = 'user_profile'
