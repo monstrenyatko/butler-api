@@ -20,7 +20,7 @@ RUN buildDeps='build-base mariadb-dev python3-dev'; \
     ln -s /sbin/su-exec /usr/bin/gosu && \
     \
     pip3 install \
-    django \
+    django==1.11.9 \
     djangorestframework \
     django-session-security \
     django-rest-swagger \
