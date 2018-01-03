@@ -27,6 +27,7 @@ RUN buildDeps='build-base mariadb-dev python3-dev'; \
     gunicorn==19.6.0 \
     mysqlclient \
     python-jose \
+    paho-mqtt \
     && \
     apk del $buildDeps && \
     rm -rf /root/.cache && mkdir -p /root/.cache && \

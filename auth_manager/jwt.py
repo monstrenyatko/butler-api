@@ -45,6 +45,10 @@ def get_user(request):
                 log.error('JWT user, name: %s, error: does not exist', username)
     return user
 
+def get_token_exp(token):
+    claims = jwt.get_unverified_claims(token)
+    return int(claims.get('exp'))
+
 def generate(user):
     """ Generates the new JWT for given user """
     return jwt.encode(
