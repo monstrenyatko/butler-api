@@ -1,8 +1,8 @@
-FROM hypriot/rpi-alpine:3.6
+FROM monstrenyatko/rpi-alpine:3.7
 
 MAINTAINER Oleg Kovalenko <monstrenyatko@gmail.com>
 
-RUN apk update && \
+RUN apk update && apk upgrade && \
     apk add --no-cache python3 py3-openssl openssl && \
     python3 -m ensurepip && \
     rm -rf /usr/lib/python*/ensurepip && \
@@ -15,10 +15,9 @@ RUN apk update && \
 RUN buildDeps='build-base mariadb-dev python3-dev'; \
     apk update && \
     apk add --no-cache $buildDeps mariadb-client-libs bash su-exec shadow && \
-    \
 # mimic gosu
     ln -s /sbin/su-exec /usr/bin/gosu && \
-    \
+#
     pip3 install \
     django==1.11.9 \
     djangorestframework \
