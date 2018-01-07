@@ -7,6 +7,18 @@ from rest_framework.authtoken.models import Token
 from . import models as local_models
 
 
+class RegionModelAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    ordering = ('name',)
+    search_fields = ('name',)
+    readonly_fields = ()
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj: # editing an existing object
+            return ('name',) + self.readonly_fields
+        return self.readonly_fields
+
+
 class UserLocationModelAdmin(admin.ModelAdmin):
     list_display = ('name',)
     ordering = ('name',)
@@ -32,7 +44,7 @@ class UserProfileModelAdmin(admin.ModelAdmin):
     ordering = ('user__username',)
     search_fields = ('user__username',)
     list_filter = ('is_device',)
-    fields = ('get_user_link', 'is_device', 'is_auth_retrieved', 'location',)
+    fields = ('get_user_link', 'is_device', 'is_auth_retrieved', 'location', 'region',)
     readonly_fields = ('get_user_link',)
 
     def get_user_link(self, obj):
@@ -175,6 +187,8 @@ class MqttAclModelAdmin(admin.ModelAdmin):
 
 admin.site.unregister(get_user_model())
 admin.site.register(get_user_model(), UserModelAdmin)
+
+admin.site.register(local_models.RegionModel, RegionModelAdmin)
 
 admin.site.register(local_models.UserLocationModel, UserLocationModelAdmin)
 

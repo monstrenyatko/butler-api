@@ -3,10 +3,29 @@ from django.db import models
 from django.core.validators import RegexValidator
 
 
+class RegionModel(models.Model):
+    NameValidator = RegexValidator(
+        r'^[0-9A-Z_]*$',
+        'Only capital Alphanumeric characters and Underscore symbol are allowed'
+    )
+
+    NAME_DEFAULT = 'DEFAULT'
+
+    name = models.CharField(max_length=50, unique=True, validators=[NameValidator])
+
+    class Meta:
+        db_table = 'region'
+        verbose_name = 'region'
+        verbose_name_plural = 'regions'
+
+    def __str__(self):
+        return self.name
+
+
 class UserLocationModel(models.Model):
     NameValidator = RegexValidator(
-        r'^[0-9a-zA-Z\-_]*$',
-        'Only Alphanumeric characters, Hyphen and Underscore symbols are allowed'
+        r'^[0-9A-Z_]*$',
+        'Only capital Alphanumeric characters and Underscore symbol are allowed'
     )
 
     NAME_UNKNOWN = 'UNKNOWN'
@@ -34,6 +53,12 @@ class UserProfileModel(models.Model):
         on_delete=models.PROTECT,
         to_field='name',
         default=UserLocationModel.NAME_UNKNOWN,
+    )
+    region = models.ForeignKey(
+        RegionModel,
+        on_delete=models.PROTECT,
+        to_field='name',
+        default=RegionModel.NAME_DEFAULT,
     )
 
     class Meta:
