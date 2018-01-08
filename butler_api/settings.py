@@ -74,6 +74,11 @@ LOGGING = {
             'level': os.environ.get('BUTLER_API_DJANGO_DB_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
+        'mqtt_manager.services.data_recorder.mqtt_client': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
     }
 }
 
@@ -143,11 +148,18 @@ DATABASES = {
         'USER': os.environ.get('BUTLER_DB_USER'),
         'PASSWORD': os.environ.get('BUTLER_DB_PASSWORD'),
         'HOST': os.environ.get('BUTLER_DB_HOST'),
-        'PORT': '',
+        'PORT': os.environ.get('BUTLER_DB_PORT', ''),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
-    }
+    },
+    'time-series': {
+        'NAME': os.environ.get('BUTLER_TSDB_NAME'),
+        'USER': os.environ.get('BUTLER_TSDB_USER'),
+        'PASSWORD': os.environ.get('BUTLER_TSDB_PASSWORD'),
+        'HOST': os.environ.get('BUTLER_TSDB_HOST'),
+        'PORT': os.environ.get('BUTLER_TSDB_PORT'),
+    },
 }
 
 
@@ -235,6 +247,16 @@ APP_DATA_CERT_KEY_FILE_MODE = int(os.environ.get('BUTLER_CERT_KEY_MODE','660'), 
 APP_DATA_FW_ROOT = MEDIA_ROOT
 APP_DATA_FW_SUBDIR = 'fw'
 APP_DATA_FW_UNUSED_DELAY = timedelta(minutes=5)
+
+
+# Sensor measurements mapping
+MEASUREMENTS = {
+    'TEMPERATURE': 'TEMPERATURE',
+    'TEMP': 'TEMPERATURE',
+    'LIGHT': 'LIGHT',
+    'HUMIDITY': 'HUMIDITY',
+    'HUMID': 'HUMIDITY',
+}
 
 
 # Load external config if required

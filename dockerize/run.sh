@@ -24,6 +24,7 @@ file_env_opt() {
 
 file_env_opt 'BUTLER_API_DJANGO_SECRET_KEY'
 file_env_opt 'BUTLER_DB_PASSWORD'
+file_env_opt 'BUTLER_TSDB_PASSWORD'
 
 set -x
 set -e

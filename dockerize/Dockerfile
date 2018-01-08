@@ -25,6 +25,7 @@ RUN buildDeps='build-base mariadb-dev python3-dev'; \
     django-rest-swagger \
     gunicorn==19.6.0 \
     mysqlclient \
+    influxdb \
     python-jose \
     paho-mqtt \
     && \
