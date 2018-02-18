@@ -14,7 +14,7 @@ def request_exit(signum, frame):
     done = True
 
 
-def run(cmd_name, f_init, f_stop, f_loop, *args):
+def run(cmd_name, f_init, f_stop, f_loop, *args, f_loop_delay_ms=3000):
     global name
     name = cmd_name
     log.info('Starting the %s', name)
@@ -28,7 +28,7 @@ def run(cmd_name, f_init, f_stop, f_loop, *args):
     while(not done):
         if call_loop:
             call_loop = f_loop()
-        time.sleep(3)
+        time.sleep(f_loop_delay_ms/1000.0)
     #
     f_stop()
     log.info('Stopped the %s', name)

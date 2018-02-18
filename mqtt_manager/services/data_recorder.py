@@ -2,6 +2,7 @@ import time
 import logging
 import re
 import json
+import socket
 from django.contrib.auth import get_user_model
 from django.conf import settings
 import paho.mqtt.client as mqtt
@@ -79,7 +80,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_disconnect(client, userdata, rc):
-    if rc != 0:
+    if rc != mqtt.MQTT_ERR_SUCCESS:
         log.warn("Unexpected disconnection. Reconnecting...")
         client.reconnect()
     else :
@@ -128,10 +129,16 @@ def on_message(client, userdata, message):
             'location': user.profile.location.name,
             'region': user.profile.region.name,
         }
-        points = make_points(user.username, json.loads(message.payload))
-        log.debug('[%s] Points: %s, Tags: %s', user.username, points, tags)
-        if points:
-            db_client.write_points(points=points, tags=tags)
+        payload = None
+        try:
+            payload = json.loads(message.payload)
+        except json.JSONDecodeError as e:
+            log.error('Message decoding failure, error: %s', e)
+        if payload:
+            points = make_points(user.username, payload)
+            if points:
+                log.debug('[%s] Points: %s, Tags: %s', user.username, points, tags)
+                db_client.write_points(points=points, tags=tags)
 
 
 def init_data_recorder(host):
@@ -158,25 +165,34 @@ def init_data_recorder(host):
 
 def stop_data_recorder():
     mqtt_client.disconnect()
-    mqtt_client.loop_stop()
 
 
 loop_connect = True
+loop_reconnect = False
 def loop_data_recorder():
-    global loop_connect
-    if is_update_required_for_topics():
-        if update_topics():
-            log.info('Topics have been updated')
-            if not loop_connect:
+    global loop_connect, loop_reconnect
+    try:
+        if is_update_required_for_topics():
+            if update_topics():
+                log.info('Topics have been updated')
+                loop_reconnect = True
+            log.debug('Topics: %s', topics)
+        if is_update_required_for_jwt():
+            update_jwt()
+            mqtt_client.username_pw_set(username=jwt, password='none')
+            loop_reconnect = True
+        if loop_connect:
+            loop_connect = False
+            loop_reconnect = False
+            mqtt_client.connect(mqtt_host)
+        else:
+            if loop_reconnect:
+                loop_reconnect = False
                 mqtt_client.reconnect()
-        log.debug('Topics: %s', topics)
-    if is_update_required_for_jwt():
-        update_jwt()
-        mqtt_client.username_pw_set(username=jwt, password='none')
-        if not loop_connect:
-            mqtt_client.reconnect()
-    if loop_connect:
-        mqtt_client.connect(mqtt_host)
-        mqtt_client.loop_start()
-        loop_connect = False
+        if mqtt.MQTT_ERR_SUCCESS != mqtt_client.loop():
+            loop_reconnect = True
+    except socket.error as e:
+        log.error('Connection failure, error: %s', e)
+        loop_reconnect = True
+        time.sleep(5)
     return True

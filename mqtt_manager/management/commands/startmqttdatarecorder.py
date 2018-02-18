@@ -13,5 +13,6 @@ class Command(BaseCommand):
                 data_recorder.init_data_recorder,
                 data_recorder.stop_data_recorder,
                 data_recorder.loop_data_recorder,
-                options['host']
+                options['host'],
+                f_loop_delay_ms=100,
         )
