@@ -50,6 +50,7 @@ COPY butler_api /butler-api/src/butler_api/
 COPY auth_manager /butler-api/src/auth_manager/
 COPY cert_manager /butler-api/src/cert_manager/
 COPY fw_manager /butler-api/src/fw_manager/
+COPY mqtt_manager /butler-api/src/mqtt_manager/
 
 VOLUME ["/butler-api/cert", "/butler-api/fw"]
 
