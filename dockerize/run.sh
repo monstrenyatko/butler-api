@@ -45,4 +45,10 @@ if [ "$1" = 'django-apps' ]; then
 	exec /app-entrypoint.sh gunicorn "$@"
 fi
 
+if [ "$1" = 'django-cli' ]; then
+	shift;
+	chown -R $APP_USERNAME:$APP_USERNAME /butler-api $BUTLER_HOME $BUTLER_MEDIA
+	exec /app-entrypoint.sh manage.py "$@"
+fi
+
 exec "$@"
