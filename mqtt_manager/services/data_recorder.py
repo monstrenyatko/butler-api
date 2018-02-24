@@ -14,6 +14,7 @@ from ..apps import MqttManagerConfig as app_config
 
 JWT_UPDATE_LEEWAY_SEC = 10*60
 TOPICS_UPDATE_AFTER_SEC = 1*60
+RECONNECT_DELAY_SEC = 5
 
 log = logging.getLogger(__name__)
 user = None
@@ -73,22 +74,24 @@ def is_update_required_for_topics():
 
 
 def on_connect(client, userdata, flags, rc):
-    log.info("Connected")
-    sub_list = [(i, 0) for i in topics]
-    if len(sub_list) > 0:
-        client.subscribe(sub_list)
+    if rc == mqtt.MQTT_ERR_SUCCESS:
+        log.info('Connected')
+        sub_list = [(i, 0) for i in topics]
+        if len(sub_list) > 0:
+            client.subscribe(sub_list)
+    else:
+        log.warn('Connect request failed, error: %d', rc)
 
 
 def on_disconnect(client, userdata, rc):
-    if rc != mqtt.MQTT_ERR_SUCCESS:
-        log.warn("Unexpected disconnection. Reconnecting...")
-        client.reconnect()
-    else :
-        log.info("Disconnected")
+    if rc == mqtt.MQTT_ERR_SUCCESS:
+        log.info('Disconnected')
+    else:
+        log.warn('Unexpected disconnection')
 
 
 def on_subscribe(client, userdata, mid, granted_qos):
-    log.info("Subscribed")
+    log.info('Subscribed')
 
 
 def make_points(username, message):
@@ -189,10 +192,13 @@ def loop_data_recorder():
             if loop_reconnect:
                 loop_reconnect = False
                 mqtt_client.reconnect()
-        if mqtt.MQTT_ERR_SUCCESS != mqtt_client.loop():
+        rc = mqtt_client.loop()
+        if mqtt.MQTT_ERR_SUCCESS != rc:
+            log.error('MQTT loop failure, error: %d', rc)
             loop_reconnect = True
+            time.sleep(RECONNECT_DELAY_SEC)
     except socket.error as e:
         log.error('Connection failure, error: %s', e)
         loop_reconnect = True
-        time.sleep(5)
+        time.sleep(RECONNECT_DELAY_SEC)
     return True
